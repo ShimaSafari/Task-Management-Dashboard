@@ -5,6 +5,8 @@ import { Todo, User } from "@/lib/types";
 import { fetchTodos, fetchUsers } from "@/lib/fetchData";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon, LoaderPinwheel } from "lucide-react";
+import TodoFilter from "@/components/TodoFilter";
+import { useState } from "react";
 
 const TodoPage = () => {
   const { data: todos, error: todosError } = useSWR<Todo[]>(
@@ -15,6 +17,15 @@ const TodoPage = () => {
     "users",
     fetchUsers
   );
+  // ------- filters
+  const [filter, setFilter] = useState<{
+    completed: boolean | null;
+    userIds: number[];
+  }>({
+    completed: null,
+    userIds: [],
+  });
+
   // ----- alert for error handling
   if (todosError || usersError) {
     return (
@@ -38,16 +49,26 @@ const TodoPage = () => {
       </div>
     );
   }
+
   // -------- join two api by UserId
   const todosByUserId = todos.map((td) => ({
     ...td,
     user: users.find((user) => user.id === td.userId),
   }));
 
+  // --------- apply filters
+  const filteredTodos = todosByUserId.filter((todo) => {
+    const applyCompleted =
+      filter.completed === null || todo.completed === filter.completed;
+    const applyUsersname =
+      filter.userIds.length === 0 || filter.userIds.includes(todo.userId);
+    return applyCompleted && applyUsersname;
+  });
   return (
     <div>
       <p>todo page</p>
-      <TodoList todos={todosByUserId} />
+      <TodoFilter users={users} onChangeFilter={setFilter} />
+      <TodoList todos={filteredTodos} />
     </div>
   );
 };
