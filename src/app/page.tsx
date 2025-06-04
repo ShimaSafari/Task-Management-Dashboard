@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <>
-      <Button>Click</Button>
+      <h1>to do manager</h1>
+      <Button>
+        <Link href={"/todo"}>show todos</Link>
+      </Button>
     </>
   );
 }
