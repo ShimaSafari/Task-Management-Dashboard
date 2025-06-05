@@ -1,3 +1,4 @@
+"use client";
 import { Todo } from "@/lib/types";
 import { Checkbox } from "@/components/ui/checkbox";
 
