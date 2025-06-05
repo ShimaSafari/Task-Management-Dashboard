@@ -17,13 +17,13 @@ export const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (initialTodos) {
-      console.log("Initial Todos:", initialTodos);
+    //   console.log("Initial Todos:", initialTodos);
       setTodos(initialTodos);
     }
   }, [initialTodos]);
 
   const addTodo = (newTodo: Todo) => {
-    console.log("Adding Todo:", newTodo);
+    // console.log("Adding Todo:", newTodo);
     setTodos([newTodo, ...todos]);
   };
 
