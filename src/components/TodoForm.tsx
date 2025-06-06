@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Todo, User } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useTodoContext } from "@/lib/TodoContext";
 
 interface TodoFormType {
@@ -20,6 +30,14 @@ const TodoForm = ({ users }: TodoFormType) => {
   const [title, setTitle] = useState("");
   const [userId, setUserId] = useState<number | null>(null);
   const { addTodo } = useTodoContext();
+  const [open, setOpen] = useState(false);
+
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.target.value);
+    },
+    []
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,44 +65,62 @@ const TodoForm = ({ users }: TodoFormType) => {
         id: Date.now(),
         user: users.find((u) => u.id === userId),
       };
-      console.log("id", uniqueTodo.id);
-
+      // console.log("id", uniqueTodo.id);
       //   console.log("Created Todo:", uniqueTodo);
       addTodo(uniqueTodo);
 
       setTitle("");
       setUserId(null);
+      setOpen(false);
     } catch (error) {
       console.error("Error creating todo:", error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">
-      <Input
-        placeholder="Task Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <Select
-        value={userId !== null ? String(userId) : ""}
-        onValueChange={(value) => setUserId(value ? Number(value) : null)}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Choose a user" />
-        </SelectTrigger>
-        <SelectContent>
-          {users.map((user) => (
-            <SelectItem key={user.id} value={String(user.id)}>
-              {user.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button type="submit" disabled={!title.trim() || userId === null}>
-        Add a Task
-      </Button>
-    </form>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>Add Task</Button>
+      </DialogTrigger>
+      <DialogContent data-animation="none">
+        <DialogHeader>
+          <DialogTitle>Create New Task</DialogTitle>
+          <DialogDescription>
+            Fill in the task title and assign it to a user. Click Add when
+            you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">
+          <Label htmlFor="title">Task Title</Label>
+          <Input
+            placeholder="Task Title"
+            value={title}
+            onChange={handleTitleChange}
+          />
+          <Label htmlFor="title">Users</Label>
+          <Select
+            value={userId !== null ? String(userId) : ""}
+            onValueChange={(value) => setUserId(value ? Number(value) : null)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Choose a user" />
+            </SelectTrigger>
+            <SelectContent>
+              {users.map((user) => (
+                <SelectItem key={user.id} value={String(user.id)}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <DialogFooter>
+            <Button type="submit" disabled={!title.trim() || userId === null}>
+              Add a Task
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
