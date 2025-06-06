@@ -66,7 +66,7 @@ const TodoContent = () => {
       <h1 className="text-2xl font-bold mb-4">Todo List</h1>
       <TodoForm users={users} />
       <TodoFilter users={users} onChangeFilter={setFilter} />
-      <TodoList todos={filteredTodos} />
+      <TodoList todos={filteredTodos} users={users} />
     </div>
   );
 };

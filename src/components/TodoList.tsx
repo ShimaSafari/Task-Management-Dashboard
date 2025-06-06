@@ -1,5 +1,5 @@
 "use client";
-import { Todo } from "@/lib/types";
+import { Todo, User } from "@/lib/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTodoContext } from "@/lib/TodoContext";
 import { useState, useCallback } from "react";
@@ -15,17 +15,26 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TodoListType {
   todos: Todo[];
+  users: User[];
 }
 
-const TodoList = ({ todos }: TodoListType) => {
+const TodoList = ({ todos, users }: TodoListType) => {
   const { updateTodo, deleteTodo } = useTodoContext();
   const [editTodo, setEditTodo] = useState<Todo | null>(null);
   const [editTitle, setEditTitle] = useState<string>("");
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editCompleted, setEditCompleted] = useState<boolean>(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   // ------ updating task
   const handleEditTitleChange = useCallback(
@@ -34,34 +43,46 @@ const TodoList = ({ todos }: TodoListType) => {
     },
     []
   );
+
   const openEditDialog = (todo: Todo) => {
     setEditTodo(todo);
     setEditTitle(todo.title);
     setEditCompleted(todo.completed);
+    setUserId(todo.userId || null);
   };
+
   const closeEditDialog = () => {
     setEditTodo(null);
     setEditTitle("");
     setEditCompleted(false);
+    setUserId(null);
   };
 
   const confirmEdit = () => {
     if (editTodo && editTitle.trim()) {
       if (
         editTitle !== editTodo.title ||
-        editCompleted !== editTodo.completed
+        editCompleted !== editTodo.completed ||
+        userId !== editTodo.userId
       ) {
-        updateTodo(editTodo.id, { title: editTitle, completed: editCompleted });
+        updateTodo(editTodo.id, {
+          title: editTitle,
+          completed: editCompleted,
+          userId: userId || editTodo.userId || 1,
+        });
       }
       setEditTodo(null);
       setEditTitle("");
       setEditCompleted(false);
+      setUserId(null);
     }
   };
   const hasChanges =
     editTodo &&
     (editTitle.trim() !== editTodo.title ||
-      editCompleted !== editTodo.completed);
+      editCompleted !== editTodo.completed ||
+      userId !== editTodo.userId);
+
   // -------- deleting task
   const openDeleteDialog = (id: number) => setDeleteId(id);
   const closeDeleteDialog = () => setDeleteId(null);
@@ -108,7 +129,7 @@ const TodoList = ({ todos }: TodoListType) => {
           <DialogHeader>
             <DialogTitle>Edit Task</DialogTitle>
             <DialogDescription>
-              You can change the title or completion status of this task.
+              You can change the title, completion status, or user of this task.
             </DialogDescription>
           </DialogHeader>
           <Input
@@ -117,6 +138,21 @@ const TodoList = ({ todos }: TodoListType) => {
             className="mb-2"
           />
           <div className="flex items-center gap-2 mb-2">
+            <Select
+              value={userId !== null ? String(userId) : ""}
+              onValueChange={(value) => setUserId(value ? Number(value) : null)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Choose a user" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={String(user.id)}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Checkbox
               checked={editCompleted}
               onCheckedChange={(checked) => setEditCompleted(Boolean(checked))}
