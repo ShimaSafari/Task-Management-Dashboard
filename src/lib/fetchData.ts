@@ -1,5 +1,5 @@
 import { User, Todo } from "./types";
-const API_URL = "https://jsonplaceholder.typicode.com";
+
 export const fetchTodos = async (): Promise<Todo[]> => {
   try {
     const res = await fetch('https://jsonplaceholder.typicode.com/todos');
