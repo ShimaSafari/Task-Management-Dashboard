@@ -45,10 +45,9 @@ const TodoFilter = ({ users, onChangeFilter }: TodoFilterType) => {
   };
 
   return (
-    <div>
-      <p>TodoFilter</p>
+   <div className="flex gap-3">
       <Select onValueChange={handleChangeComplete}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-40">
           <SelectValue placeholder="Tasks" />
         </SelectTrigger>
         <SelectContent>
@@ -63,13 +62,13 @@ const TodoFilter = ({ users, onChangeFilter }: TodoFilterType) => {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-[180px] flex justify-start">
+          <Button variant="outline" className="w-48 flex justify-start">
             {selectedUserIds.length > 0
               ? `${selectedUserIds.length} User Selected`
               : "All Users"}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[180px]">
+        <DropdownMenuContent className="w-48">
           <DropdownMenuCheckboxItem disabled>Users</DropdownMenuCheckboxItem>
           <DropdownMenuSeparator />
           {users.map((user) => (

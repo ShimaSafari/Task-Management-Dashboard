@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useTodoContext } from "@/lib/TodoContext";
+import { Plus } from "lucide-react";
 
 interface TodoFormType {
   users: User[];
@@ -80,7 +81,10 @@ const TodoForm = ({ users }: TodoFormType) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Task</Button>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" />
+          Add Task
+        </Button>
       </DialogTrigger>
       <DialogContent data-animation="none">
         <DialogHeader>
