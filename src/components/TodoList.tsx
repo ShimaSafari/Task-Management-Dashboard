@@ -193,8 +193,8 @@ const TodoList = ({ todos, users }: TodoListType) => {
                       variant="outline"
                       className={
                         todo.completed
-                          ? " text-green-400 border-0"
-                          : " text-orange-400 border-0"
+                          ? "text-green-400 border-0"
+                          : "text-orange-400 border-0"
                       }
                     >
                       {todo.completed ? "Completed" : "Incomplete"}
@@ -226,7 +226,7 @@ const TodoList = ({ todos, users }: TodoListType) => {
                     setUserId(value ? Number(value) : null)
                   }
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-48">
                     <SelectValue placeholder="Choose a user" />
                   </SelectTrigger>
                   <SelectContent>
@@ -269,8 +269,8 @@ const TodoList = ({ todos, users }: TodoListType) => {
                 </DialogDescription>
               </DialogHeader>
               <p>
-                Are you sure you want to delete "
-                {todos.find((t) => t.id === deleteId)?.title}"?
+                Are you sure you want to delete
+                {todos.find((t) => t.id === deleteId)?.title}?
               </p>
               <DialogFooter>
                 <DialogClose asChild>

@@ -98,7 +98,7 @@ const TodoForm = ({ users }: TodoFormType) => {
           <DialogTitle>Create New Task</DialogTitle>
           <DialogDescription>
             Fill in the task title and assign it to a user. Click Add when
-            you're done.
+            you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">

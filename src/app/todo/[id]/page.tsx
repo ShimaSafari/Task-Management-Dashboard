@@ -41,6 +41,7 @@ export default function TodoDetailPage() {
       );
     } catch (error) {
       toast.error("Failed to update task");
+      console.error("Error updating task:", error);
     }
   };
 

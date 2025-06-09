@@ -12,7 +12,7 @@ const NotFound = () => {
         <div className="space-y-2">
           <h1 className="text-4xl font-bold">404 - Not Found</h1>
           <p className="text-xl text-muted-foreground">
-            The page or task you're looking for doesn't exist.
+            The page or task you're looking for doesn&apos;t exist.
           </p>
         </div>
 
