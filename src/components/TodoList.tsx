@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   CircleAlert,
   CircleCheckBig,
+  Loader2,
   SquarePen,
   Trash2,
 } from "lucide-react";
@@ -31,6 +32,7 @@ import {
 import { motion } from "motion/react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface TodoListType {
   todos: Todo[];
@@ -44,22 +46,23 @@ const TodoList = ({ todos, users }: TodoListType) => {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editCompleted, setEditCompleted] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // ------ updating task
+  // ------ updates the title input
   const handleEditTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEditTitle(e.target.value);
     },
     []
   );
-
+  // -------- opens the edit dialog
   const openEditDialog = (todo: Todo) => {
     setEditTodo(todo);
     setEditTitle(todo.title);
     setEditCompleted(todo.completed);
     setUserId(todo.userId || null);
   };
-
+  // ------- closes the edit dialog
   const closeEditDialog = () => {
     setEditTodo(null);
     setEditTitle("");
@@ -67,7 +70,9 @@ const TodoList = ({ todos, users }: TodoListType) => {
     setUserId(null);
   };
 
+  // ----- updates the task in context
   const confirmEdit = () => {
+    setIsLoading(true);
     if (editTodo && editTitle.trim()) {
       if (
         editTitle !== editTodo.title ||
@@ -80,12 +85,15 @@ const TodoList = ({ todos, users }: TodoListType) => {
           userId: userId || editTodo.userId || 1,
         });
       }
+      setIsLoading(false);
       setEditTodo(null);
       setEditTitle("");
       setEditCompleted(false);
       setUserId(null);
     }
   };
+
+  // -----checks any field changes
   const hasChanges =
     editTodo &&
     (editTitle.trim() !== editTodo.title ||
@@ -96,6 +104,7 @@ const TodoList = ({ todos, users }: TodoListType) => {
   const openDeleteDialog = (id: number) => setDeleteId(id);
   const closeDeleteDialog = () => setDeleteId(null);
 
+  // --------- deletes the task in context
   const confirmDelete = () => {
     if (deleteId !== null) {
       deleteTodo(deleteId);
@@ -132,7 +141,7 @@ const TodoList = ({ todos, users }: TodoListType) => {
           {todos.map((todo) => (
             <Card
               key={todo.id}
-              className="bg-white/10 backdrop-blur-sm border-white/20 transition-all duration-300 hover:bg-primary/10 hover:shadow-lg hover:scale-105 hover:border-primary/30"
+              className="bg-white/10 backdrop-blur-sm border-white/20 transition-all duration-300 hover:bg-primary/10 hover:shadow-lg hover:scale-102 hover:border-primary/30"
             >
               <CardContent className="py-2">
                 <div className="space-y-6">
@@ -145,13 +154,15 @@ const TodoList = ({ todos, users }: TodoListType) => {
                       )}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <h3
-                        className={`font-semibold leading-tight break-words max-w-full ${
-                          todo.completed ? "line-through opacity-60" : ""
-                        }`}
-                      >
-                        {todo.title}
-                      </h3>
+                      <Link href={`/todo/${todo.id}`}>
+                        <h3
+                          className={`font-semibold leading-tight break-words max-w-full ${
+                            todo.completed ? "line-through opacity-60" : ""
+                          }`}
+                        >
+                          {todo.title}
+                        </h3>
+                      </Link>
                     </div>
                     <Button
                       size="icon"
@@ -239,7 +250,11 @@ const TodoList = ({ todos, users }: TodoListType) => {
                   <Button variant="outline">Cancel</Button>
                 </DialogClose>
                 <Button onClick={confirmEdit} disabled={!hasChanges}>
-                  Save
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Save Changes"
+                  )}
                 </Button>
               </DialogFooter>
             </DialogContent>

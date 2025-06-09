@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { TodoProvider } from "@/lib/TodoContext";
 import { Toaster } from "@/components/ui/sonner";
+import Header from "@/components/Header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,11 +32,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TodoProvider>
+            <Header />
             <div className="min-h-screen bg-background">
               {/* Main Content */}
               <main className="flex-1">{children}</main>
             </div>
-            <Toaster />
+            <Toaster richColors />
           </TodoProvider>
         </ThemeProvider>
       </body>

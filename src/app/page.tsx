@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import TodoContent from "@/components/TodoContent";
-import Header from "@/components/Header";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -12,8 +11,6 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       <div className="flex">
         <main className="flex-1">
           <div className="container mx-auto p-4 lg:p-8">

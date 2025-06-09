@@ -31,11 +31,12 @@ const TodoContent = () => {
   if (usersError) {
     return (
       <div>
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="border border-destructive">
           <AlertCircleIcon />
-          <AlertTitle>Error, please try again.</AlertTitle>
+          <AlertTitle>Error loading users</AlertTitle>
           <AlertDescription>
-            {usersError?.message || "An error occurred"}
+            {usersError?.message ||
+              "We couldn't fetch the user data. Please check your connection and try again."}
           </AlertDescription>
         </Alert>
       </div>
@@ -79,7 +80,7 @@ const TodoContent = () => {
   const inProgressCount = todosByUserId.filter((t) => !t.completed).length;
   return (
     <div className="container max-w-7xl mx-auto space-y-6">
-      {/* Stats Cards */}
+      {/* ---------- Stats Cards ---------- */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-white/10 shadow-md">
           <CardContent className="p-6 text-center">
@@ -102,7 +103,7 @@ const TodoContent = () => {
             <div className="text-3xl font-bold text-orange-400">
               {inProgressCount}
             </div>
-            <div>In Complete</div>
+            <div>InComplete</div>
           </CardContent>
         </Card>
         <Card className="bg-white/10 shadow-md">
@@ -114,7 +115,7 @@ const TodoContent = () => {
           </CardContent>
         </Card>
       </div>
-      {/* Header Section */}
+      {/* ---------- Header Section ----------*/}
       <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Tasks</h2>
@@ -125,20 +126,20 @@ const TodoContent = () => {
         <TodoForm users={users} />
       </div>
 
-      {/* Search and Filter Section */}
+      {/* ---------- Search and Filter Section -------- */}
       <Card className="backdrop-blur-sm shadow-none">
         <CardContent className="px-6 py-2">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1 justify-between">
-              {/* Search Input */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-between">
+        
               <Input
-                placeholder="Search tasks..."
+                placeholder="Search tasks title..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 max-w-md py-3"
+                className="w-auto md:w-1/2 text-sm"
               />
 
-              {/* Filter Component */}
+              {/* -------- Filter Component --------- */}
               <div className="">
                 <TodoFilter users={users} onChangeFilter={setFilter} />
               </div>
@@ -147,6 +148,7 @@ const TodoContent = () => {
         </CardContent>
       </Card>
       <div>
+        {/* -------- Todo List Component --------- */}
         <TodoList todos={filteredTodos} users={users} />
       </div>
     </div>

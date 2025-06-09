@@ -31,11 +31,14 @@ const TodoFilter = ({ users, onChangeFilter }: TodoFilterType) => {
   const [completed, setComplete] = useState<boolean | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
+  // ------- updates status filter from select
   const handleChangeComplete = (value: string) => {
     const selectedStatus = value === "all" ? null : value === "completed";
     setComplete(selectedStatus);
     onChangeFilter({ completed: selectedStatus, userIds: selectedUserIds });
   };
+
+  // --------- select user filter from drop down
   const handleChangeUser = (userId: number, checked: boolean) => {
     const selectedUser = checked
       ? [...selectedUserIds, userId]
@@ -43,17 +46,22 @@ const TodoFilter = ({ users, onChangeFilter }: TodoFilterType) => {
     setSelectedUserIds(selectedUser);
     onChangeFilter({ completed, userIds: selectedUser });
   };
-
+  
+  // --------- reset user filter
+  const handleClearAllUsers = () => {
+    setSelectedUserIds([]);
+    onChangeFilter({ completed, userIds: [] });
+  };
   return (
-   <div className="flex gap-3">
+    <div className="flex gap-3 w-full">
       <Select onValueChange={handleChangeComplete}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Tasks" />
+        <SelectTrigger className="w-1/2 md:w-32">
+          <SelectValue placeholder="All Status" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectLabel>Status</SelectLabel>
-            <SelectItem value="all">All Task</SelectItem>
+            <SelectLabel>Choose Status</SelectLabel>
+            <SelectItem value="all">All Tasks</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
             <SelectItem value="incompleted">Incompleted</SelectItem>
           </SelectGroup>
@@ -62,14 +70,21 @@ const TodoFilter = ({ users, onChangeFilter }: TodoFilterType) => {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-48 flex justify-start">
+          <Button
+            variant="outline"
+            className={`w-1/2 sm:w-48 flex justify-start ${
+              selectedUserIds.length == 0 && "text-muted-foreground"
+            }`}
+          >
             {selectedUserIds.length > 0
               ? `${selectedUserIds.length} User Selected`
               : "All Users"}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-48">
-          <DropdownMenuCheckboxItem disabled>Users</DropdownMenuCheckboxItem>
+        <DropdownMenuContent className="w-full sm:w-48">
+          <DropdownMenuCheckboxItem onSelect={handleClearAllUsers}>
+            All Users
+          </DropdownMenuCheckboxItem>
           <DropdownMenuSeparator />
           {users.map((user) => (
             <DropdownMenuCheckboxItem
