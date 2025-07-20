@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import { ListTodo } from 'lucide-react';
 
 const Header = () => {
   return (
@@ -11,13 +12,13 @@ const Header = () => {
             className="flex items-center gap-2 group"
             aria-label="Dashboard"
           >
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-primary to-purple-600 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary to-purple-600 flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">
-                VT
+               <ListTodo />
               </span>
             </div>
             <span className="font-semibold text-lg tracking-tight hover:text-primary transition-colors">
-              Vesta Task Manager
+              My Task Manager
             </span>
           </Link>
         </div>
