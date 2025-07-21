@@ -39,11 +39,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination";
 
 interface TodoListType {
   todos: Todo[];
@@ -362,8 +357,9 @@ const TodoList = ({ todos: initialTodos, users }: TodoListType) => {
             <DialogDescription>This action cannot be undone.</DialogDescription>
           </DialogHeader>
           <p>
-            Are you sure you want to delete "
-            {initialTodos.find((t) => t.id === deleteId)?.title}"?
+            Are you sure you want to delete &quot;
+            {initialTodos.find((t) => t.id === deleteId)?.title}
+            &quot;?
           </p>
           <DialogFooter>
             <DialogClose asChild>
