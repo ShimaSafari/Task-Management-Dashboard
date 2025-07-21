@@ -33,13 +33,24 @@ import { motion } from "motion/react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from "@/components/ui/pagination";
 
 interface TodoListType {
   todos: Todo[];
   users: User[];
 }
 
-const TodoList = ({ todos, users }: TodoListType) => {
+const TodoList = ({ todos: initialTodos, users }: TodoListType) => {
   const { updateTodo, deleteTodo } = useTodoContext();
   const [editTodo, setEditTodo] = useState<Todo | null>(null);
   const [editTitle, setEditTitle] = useState<string>("");
@@ -47,6 +58,14 @@ const TodoList = ({ todos, users }: TodoListType) => {
   const [editCompleted, setEditCompleted] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  // ------ pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTodos = initialTodos.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(initialTodos.length / itemsPerPage);
 
   // ------ updates the title input
   const handleEditTitleChange = useCallback(
@@ -55,6 +74,7 @@ const TodoList = ({ todos, users }: TodoListType) => {
     },
     []
   );
+
   // -------- opens the edit dialog
   const openEditDialog = (todo: Todo) => {
     setEditTodo(todo);
@@ -62,6 +82,7 @@ const TodoList = ({ todos, users }: TodoListType) => {
     setEditCompleted(todo.completed);
     setUserId(todo.userId || null);
   };
+
   // ------- closes the edit dialog
   const closeEditDialog = () => {
     setEditTodo(null);
@@ -93,7 +114,7 @@ const TodoList = ({ todos, users }: TodoListType) => {
     }
   };
 
-  // -----checks any field changes
+  // ----- checks any field changes
   const hasChanges =
     editTodo &&
     (editTitle.trim() !== editTodo.title ||
@@ -111,9 +132,19 @@ const TodoList = ({ todos, users }: TodoListType) => {
       setDeleteId(null);
     }
   };
+
+  // ----- pagination functions
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // ----- changes the number of items per page
+  const handlePageSizeChange = (value: string) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1); // Reset to first
+  };
+
   return (
     <>
-      {todos.length === 0 ? (
+      {currentTodos.length === 0 ? (
         <motion.div
           className="text-center py-12"
           initial={{ opacity: 0 }}
@@ -134,11 +165,9 @@ const TodoList = ({ todos, users }: TodoListType) => {
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{
-            duration: 0.3,
-          }}
+          transition={{ duration: 0.3 }}
         >
-          {todos.map((todo) => (
+          {currentTodos.map((todo) => (
             <Card
               key={todo.id}
               className="bg-white/10 backdrop-blur-sm border-white/20 transition-all duration-300 hover:bg-primary/10 hover:shadow-lg hover:scale-102 hover:border-primary/30"
@@ -188,7 +217,6 @@ const TodoList = ({ todos, users }: TodoListType) => {
                       </div>
                       <span>{todo.user?.name}</span>
                     </div>
-
                     <Badge
                       variant="outline"
                       className={
@@ -204,86 +232,149 @@ const TodoList = ({ todos, users }: TodoListType) => {
               </CardContent>
             </Card>
           ))}
-
-          <Dialog open={editTodo !== null} onOpenChange={closeEditDialog}>
-            <DialogContent data-animation="none">
-              <DialogHeader>
-                <DialogTitle>Edit Task</DialogTitle>
-                <DialogDescription>
-                  You can change the title, completion status, or user of this
-                  task.
-                </DialogDescription>
-              </DialogHeader>
-              <Input
-                value={editTitle}
-                onChange={handleEditTitleChange}
-                className="mb-2"
-              />
-              <div className="flex items-center gap-2 mb-2">
-                <Select
-                  value={userId !== null ? String(userId) : ""}
-                  onValueChange={(value) =>
-                    setUserId(value ? Number(value) : null)
-                  }
-                >
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Choose a user" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={String(user.id)}>
-                        {user.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Checkbox
-                  checked={editCompleted}
-                  onCheckedChange={(checked) =>
-                    setEditCompleted(Boolean(checked))
-                  }
-                />
-                <span>Completed</span>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button onClick={confirmEdit} disabled={!hasChanges}>
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={deleteId !== null} onOpenChange={closeDeleteDialog}>
-            <DialogContent data-animation="none">
-              <DialogHeader>
-                <DialogTitle>Confirm Deletion</DialogTitle>
-                <DialogDescription>
-                  This action cannot be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <p>
-                Are you sure you want to delete
-                {todos.find((t) => t.id === deleteId)?.title}?
-              </p>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">No</Button>
-                </DialogClose>
-                <Button variant="destructive" onClick={confirmDelete}>
-                  Yes
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </motion.div>
       )}
+
+      {/* ------- pagination controls ------- */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between my-8">
+          <div className="flex items-center justify-between w-full">
+            <div className="text-sm font-medium">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex items-center gap-2">
+              {/* First Page Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="hidden size-8 sm:flex hover:text-primary"
+                onClick={() => paginate(1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronsLeft />
+              </Button>
+              {/* Previous Page Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 hover:border-2 hover:border-primary dark:hover:border-primary hover:text-primary"
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft />
+              </Button>
+              {/* Next Page Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 hover:border-2 hover:border-primary dark:hover:border-primary hover:text-primary"
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight />
+              </Button>
+              {/* Last Page Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="hidden size-8 sm:flex hover:text-primary"
+                onClick={() => paginate(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronsRight />
+              </Button>
+            </div>
+            <div className="flex items-center">
+              <Select
+                value={`${itemsPerPage}`}
+                onValueChange={handlePageSizeChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={itemsPerPage} />
+                </SelectTrigger>
+                <SelectContent>
+                  {[6, 12, 21].map((pageSize) => (
+                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                      {pageSize} per page
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Dialog open={editTodo !== null} onOpenChange={closeEditDialog}>
+        <DialogContent data-animation="none">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+            <DialogDescription>
+              You can change the title, completion status, or user of this task.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            value={editTitle}
+            onChange={handleEditTitleChange}
+            className="mb-2"
+          />
+          <div className="flex items-center gap-2 mb-2">
+            <Select
+              value={userId !== null ? String(userId) : ""}
+              onValueChange={(value) => setUserId(value ? Number(value) : null)}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Choose a user" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={String(user.id)}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Checkbox
+              checked={editCompleted}
+              onCheckedChange={(checked) => setEditCompleted(Boolean(checked))}
+            />
+            <span>Completed</span>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={confirmEdit} disabled={!hasChanges}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteId !== null} onOpenChange={closeDeleteDialog}>
+        <DialogContent data-animation="none">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>This action cannot be undone.</DialogDescription>
+          </DialogHeader>
+          <p>
+            Are you sure you want to delete "
+            {initialTodos.find((t) => t.id === deleteId)?.title}"?
+          </p>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">No</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Yes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
